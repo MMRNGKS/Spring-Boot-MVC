@@ -1,0 +1,36 @@
+services:
+    spring-db:
+        image: postgres:latest
+        container_name: spring-db
+        restart: always
+        environment:
+          - POSTGRES_USER=postgres
+          - POSTGRES_PASSWORD=qwerty
+          - POSTGRES_DB=student
+          - PGPORT=5433
+        command: postgres -c 'max_connections=1000'
+        expose:
+            - 5433
+        ports:
+            - 5433:5432
+        volumes:
+            - practice-postgres-spring-data:/var/lib/postgresql
+
+    spring:
+        image: practice-img
+        container_name: spring-practice
+        build:
+            context: .
+        ports:
+            - 8089:8089
+        links:
+            - spring-db
+        depends_on:
+            - spring-db
+        environment:
+            - SPRING_DATA_SOURCE_URL=jdbc:postgresql://spring-db:5433/student
+            - SPRING_DATASOURCE_USERNAME=postgres
+            - SPRING_DATASOURCE_PASSWORD=qwerty
+
+volumes:
+    practice-postgres-spring-data:
